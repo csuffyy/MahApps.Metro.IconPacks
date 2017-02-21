@@ -25,15 +25,24 @@ namespace MahApps.Metro.IconPacks.Browser.ViewModels
             this.SelectedIcon = this.Icons.First();
         }
 
+        public IconPackViewModel(MainViewModel mainViewModel, string caption, Type packType)
+        {
+            this.MainViewModel = mainViewModel;
+            this.Caption = caption;
+            this.Icons = GetAllIcons(packType);
+            this.PrepareFiltering();
+            this.SelectedIcon = this.Icons.First();
+        }
+
         public MainViewModel MainViewModel { get; private set; }
 
         private void PrepareFiltering()
         {
             this._iconsCollectionView = CollectionViewSource.GetDefaultView(this.Icons);
-            this._iconsCollectionView.Filter = o => this.FilterIconsPredicate(this.FilterText, (IIconViewModel) o);
+            this._iconsCollectionView.Filter = o => FilterIconsPredicate(this.FilterText, (IIconViewModel)o);
         }
 
-        private bool FilterIconsPredicate(string filterText, IIconViewModel iconViewModel)
+        private static bool FilterIconsPredicate(string filterText, IIconViewModel iconViewModel)
         {
             return string.IsNullOrWhiteSpace(filterText)
                    || iconViewModel.Name.IndexOf(filterText, StringComparison.CurrentCultureIgnoreCase) >= 0
@@ -54,6 +63,17 @@ namespace MahApps.Metro.IconPacks.Browser.ViewModels
                     .OfType<Enum>()
                     .Select(k => GetIconViewModel(enumType, packType, k))
                     .OrderBy(m => m.Name, StringComparer.InvariantCultureIgnoreCase));
+        }
+
+        private static IEnumerable<IIconViewModel> GetAllIcons(Type packType)
+        {
+            var allIcons = new List<IIconViewModel>();
+            allIcons.AddRange(GetIcons(typeof(PackIconMaterialKind), packType));
+            allIcons.AddRange(GetIcons(typeof(PackIconFontAwesomeKind), packType));
+            allIcons.AddRange(GetIcons(typeof(PackIconOcticonsKind), packType));
+            allIcons.AddRange(GetIcons(typeof(PackIconModernKind), packType));
+            allIcons.AddRange(GetIcons(typeof(PackIconEntypoKind), packType));
+            return allIcons;
         }
 
         private static IIconViewModel GetIconViewModel(Type enumType, Type packType, Enum k)
@@ -125,7 +145,7 @@ namespace MahApps.Metro.IconPacks.Browser.ViewModels
                     CanExecuteDelegate = x => (x != null),
                     ExecuteDelegate = x => Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        var icon = (IIconViewModel) x;
+                        var icon = (IIconViewModel)x;
                         var text = $"<iconPacks:{icon.IconPackType.Name} Kind=\"{icon.Name}\" />";
                         Clipboard.SetDataObject(text);
                     }))

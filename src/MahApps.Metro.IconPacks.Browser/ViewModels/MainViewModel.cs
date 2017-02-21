@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ControlzEx;
 
 namespace MahApps.Metro.IconPacks.Browser.ViewModels
 {
@@ -21,6 +22,7 @@ namespace MahApps.Metro.IconPacks.Browser.ViewModels
             this.IconPacks = new ObservableCollection<IconPackViewModel>(
                 new[]
                 {
+                    new IconPackViewModel(this, "All", typeof(PackIconBase)),
                     new IconPackViewModel(this, "Material", typeof(PackIconMaterialKind), typeof(PackIconMaterial)),
                     new IconPackViewModel(this, "FontAwesome", typeof(PackIconFontAwesomeKind), typeof(PackIconFontAwesome)),
                     new IconPackViewModel(this, "Octicons", typeof(PackIconOcticonsKind), typeof(PackIconOcticons)),
